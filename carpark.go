@@ -3,15 +3,15 @@ package main
 import (
 	"container/heap"
 	"fmt"
-	"util"
+	"minheap"
 )
 
 // Carpark represents the carpark map, empty slots, and maximum number of slots filled
 type Carpark struct {
-	Map         map[int]*Car       //Properties of each parked in the carpark
-	EmptySlot   util.PriorityQueue //Heap containing sorted empty slots in ascending order
-	HighestSlot int                //Highest number of slots filled throughout carpark operation
-	MaxSlot     int                //Maximum number of slots available
+	Map         map[int]*Car          //Properties of each parked in the carpark
+	EmptySlot   minheap.PriorityQueue //Heap containing sorted empty slots in ascending order
+	HighestSlot int                   //Highest number of slots filled throughout carpark operation
+	MaxSlot     int                   //Maximum number of slots available
 }
 
 func (carpark *Carpark) init(maxSlot int) {
@@ -28,7 +28,7 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 		carpark.HighestSlot = slotNo
 	} else { //Get nearest empty slot if available
 		item := heap.Pop(&carpark.EmptySlot)
-		slotNo = item.(*util.Item).Value
+		slotNo = item.(*minheap.Item).Value
 	}
 	if slotNo > carpark.MaxSlot {
 		return 0, fmt.Errorf("Sorry, parking lot is full")
@@ -43,7 +43,7 @@ func (carpark *Carpark) removeCar(slotNo int) {
 	//Remove car from carpark Map
 	delete(carpark.Map, slotNo)
 	//Add empty slot to the heap
-	heap.Push(&carpark.EmptySlot, &util.Item{Value: slotNo})
+	heap.Push(&carpark.EmptySlot, &minheap.Item{Value: slotNo})
 }
 
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string) {

@@ -1,4 +1,4 @@
-package util
+package minheap
 
 //Item details
 type Item struct {

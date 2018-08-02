@@ -3,22 +3,29 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"minheap"
 	"os"
+	"pretty"
 	"runtime"
 	"strconv"
 	"strings"
-	"util"
 )
 
 //Create a carpark
 var carpark = &Carpark{
 	Map:       make(map[int]*Car),
-	EmptySlot: util.PriorityQueue{},
+	EmptySlot: minheap.PriorityQueue{},
 }
 
 func main() {
 	//Create reader input from console
 	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimRight(input, "\r\n")
+	s := parse(input)
+	fmt.Println(s)
+
+	return
 
 	//Identify operating system used
 	var terminal string
@@ -45,7 +52,7 @@ func main() {
 			carpark.init(maxSlot)
 			fmt.Printf("Created parking lot with %v slots\n", maxSlot)
 			finish = true
-			
+
 		default: //Default option
 			fmt.Println("Your command cannot be understood")
 		}
@@ -82,11 +89,11 @@ func main() {
 
 		case "registration_numbers_for_cars_with_colour": //Return registration numbers with given car colour
 			_, registration := carpark.getCarsWithColour(s[1])
-			prettyPrintStrings(registration)
+			pretty.PrintStrings(registration)
 
 		case "slot_numbers_for_cars_with_colour": //Return slot numbers with given car colour
 			slots, _ := carpark.getCarsWithColour(s[1])
-			prettyPrintInts(slots)
+			pretty.PrintInts(slots)
 
 		case "slot_number_for_registration_number": //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
@@ -119,22 +126,8 @@ func parse(input string) []string {
 	return s
 }
 
-func prettyPrintStrings(in []string) {
-	if len(in) == 0 {
-		return
+func check(e error) {
+	if e != nil {
+		panic(e)
 	}
-	for i := 0; i < len(in)-1; i++ {
-		fmt.Printf("%v, ", in[i])
-	}
-	fmt.Printf("%v\n", in[len(in)-1])
-}
-
-func prettyPrintInts(in []int) {
-	if len(in) == 0 {
-		return
-	}
-	for i := 0; i < len(in)-1; i++ {
-		fmt.Printf("%v, ", in[i])
-	}
-	fmt.Printf("%v\n", in[len(in)-1])
 }

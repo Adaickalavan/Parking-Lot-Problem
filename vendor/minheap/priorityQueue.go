@@ -1,9 +1,5 @@
-//Package util implements the heap structure from https://golang.org/pkg/container/heap/
-package util
-
-import (
-	"container/heap"
-)
+//Package util implements the heap structure
+package minheap
 
 //PriorityQueue implements a min heap
 type PriorityQueue []*Item
@@ -40,9 +36,4 @@ func (pq *PriorityQueue) Pop() interface{} {
 	item.index = -1
 	*pq = old[0 : n-1]
 	return item
-}
-
-func (pq *PriorityQueue) update(item *Item, value int) {
-	item.Value = value
-	heap.Fix(pq, item.index)
 }
