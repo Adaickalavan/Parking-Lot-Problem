@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"minheap"
 	"os"
 	"pretty"
 	"runtime"
@@ -11,21 +10,40 @@ import (
 	"strings"
 )
 
-//Create a carpark
-var carpark = &Carpark{
-	Map:       make(map[int]*Car),
-	EmptySlot: minheap.PriorityQueue{},
-}
-
 func main() {
-	//Create reader input from console
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimRight(input, "\r\n")
-	s := parse(input)
-	fmt.Println(s)
+	// Verify if input file or interactive mode to be used.
+	// Identify input file name if any.
+	// ii := len(os.Args)
+	// switch {
+	// case ii > 2:
+	// 	log.Fatal("Unknown command line input")
+	// case ii == 2:
+	// 	file, err := os.Open(os.Args[1])
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	defer file.Close()
+	// 	scanner := bufio.NewScanner(file)
+	// 	for scanner.Scan() {
+	// 		fmt.Println(scanner.Text())
+	// 		fmt.Println("kios")
+	// 	}
 
-	return
+	// 	if err := scanner.Err(); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// default:
+	// 	fmt.Println("hi")
+	// }
+
+	// //Create reader input from console
+	// reader := bufio.NewReader(os.Stdin)
+	// // input, _ := reader.ReadString('\n')
+	// // input = strings.TrimRight(input, "\r\n")
+	// // s := parse(input)
+	// // fmt.Println(s)
+
+	// return
 
 	//Identify operating system used
 	var terminal string
@@ -35,9 +53,28 @@ func main() {
 		terminal = "\n"
 	}
 
+	reader := bufio.NewReader(os.Stdin)
+	//Create a carpark
+	var carpark = &Carpark{}
+
 	//Initialize carpark
-	finish := false
-	for !finish {
+	exit := false
+	for !exit {
+
+		// file, err := os.Open(os.Args[1])
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// scanner := bufio.NewScanner(file)
+		// for scanner.Scan() {
+		// 	fmt.Println(scanner.Text())
+		// 	fmt.Println("kios")
+		// }
+
+		// if err := scanner.Err(); err != nil {
+		// 	log.Fatal(err)
+		// }
+
 		fmt.Print("Enter command: ")
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimRight(input, terminal)
@@ -51,7 +88,7 @@ func main() {
 			}
 			carpark.init(maxSlot)
 			fmt.Printf("Created parking lot with %v slots\n", maxSlot)
-			finish = true
+			exit = true
 
 		default: //Default option
 			fmt.Println("Your command cannot be understood")
@@ -59,8 +96,8 @@ func main() {
 	}
 
 	//Read input queries from console
-	finish = false
-	for !finish {
+	exit = false
+	for !exit {
 		fmt.Print("Enter command: ")
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimRight(input, terminal)
@@ -84,16 +121,20 @@ func main() {
 				fmt.Println(err.Error())
 				break
 			}
-			carpark.removeCar(slotNo)
-			fmt.Printf("Slot number %v is free\n", slotNo)
+			err = carpark.removeCar(slotNo)
+			if err != nil {
+				fmt.Println(err.Error())
+			} else {
+				fmt.Printf("Slot number %v is free\n", slotNo)
+			}
 
 		case "registration_numbers_for_cars_with_colour": //Return registration numbers with given car colour
 			_, registration := carpark.getCarsWithColour(s[1])
-			pretty.PrintStrings(registration)
+			pretty.Printer(registration)
 
 		case "slot_numbers_for_cars_with_colour": //Return slot numbers with given car colour
 			slots, _ := carpark.getCarsWithColour(s[1])
-			pretty.PrintInts(slots)
+			pretty.Printer(slots)
 
 		case "slot_number_for_registration_number": //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
@@ -112,11 +153,11 @@ func main() {
 				}
 			}
 
-		case "done": //End carpark operation
-			finish = true
+		case "exit": //End carpark operation
+			exit = true
 
-		default: //Default option
-			fmt.Println("Your command cannot be understood")
+			// default: //Default option
+			// 	fmt.Println("Your command cannot be understood")
 		}
 	}
 }

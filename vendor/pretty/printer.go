@@ -1,27 +1,18 @@
 package pretty
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
-type Printer interface {
-	print()
-}
-
-func PrintStrings(in []string) {
-	if len(in) == 0 {
+// Printer pretty prints any array, slice, or string
+func Printer(in interface{}) {
+	v := reflect.ValueOf(in)
+	if v.Len() == 0 {
 		return
 	}
-	for i := 0; i < len(in)-1; i++ {
-		fmt.Printf("%v, ", in[i])
+	for i := 0; i < v.Len()-1; i++ {
+		fmt.Printf("%v, ", v.Index(i))
 	}
-	fmt.Printf("%v\n", in[len(in)-1])
-}
-
-func PrintInts(in []int) {
-	if len(in) == 0 {
-		return
-	}
-	for i := 0; i < len(in)-1; i++ {
-		fmt.Printf("%v, ", in[i])
-	}
-	fmt.Printf("%v\n", in[len(in)-1])
+	fmt.Printf("%v\n", v.Index(v.Len()-1))
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"minheap"
 )
@@ -15,9 +16,10 @@ type Carpark struct {
 }
 
 func (carpark *Carpark) init(maxSlot int) {
-	//Initialize the heap of empty parking slots
-	heap.Init(&carpark.EmptySlot)
-	carpark.MaxSlot = maxSlot
+	carpark.Map = make(map[int]*Car)            //Setup a map of the carpark
+	carpark.EmptySlot = minheap.PriorityQueue{} //Setup an empty heap of empty parking slots
+	heap.Init(&carpark.EmptySlot)               //Initialize the heap of empty parking slots
+	carpark.MaxSlot = maxSlot                   //Set the maximum number of slots
 }
 
 func (carpark *Carpark) insertCar(car *Car) (int, error) {
@@ -39,11 +41,15 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 	return slotNo, nil
 }
 
-func (carpark *Carpark) removeCar(slotNo int) {
-	//Remove car from carpark Map
-	delete(carpark.Map, slotNo)
-	//Add empty slot to the heap
-	heap.Push(&carpark.EmptySlot, &minheap.Item{Value: slotNo})
+func (carpark *Carpark) removeCar(slotNo int) error {
+	if _, ok := carpark.Map[slotNo]; ok {
+		//Remove car from carpark Map
+		delete(carpark.Map, slotNo)
+		//Add empty slot to the heap
+		heap.Push(&carpark.EmptySlot, &minheap.Item{Value: slotNo})
+		return nil
+	}
+	return errors.New("Car non-existent in carpark")
 }
 
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string) {

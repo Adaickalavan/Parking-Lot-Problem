@@ -1,1 +1,31 @@
-[fsdf]
+[C:\GoWorkspace\bin\goparkinglot.exe input.txt]
+create_parking_lot 6
+kios
+park KA-01-HH-1234 White
+kios
+park KA-01-HH-9999 White
+kios
+park KA-01-BB-0001 Black
+kios
+park KA-01-HH-7777 Red
+kios
+park KA-01-HH-2701 Blue
+kios
+park KA-01-HH-3141 Black
+kios
+leave 4
+kios
+status
+kios
+park KA-01-P-333 White
+kios
+park DL-12-AA-9999 White
+kios
+registration_numbers_for_cars_with_colour White
+kios
+slot_numbers_for_cars_with_colour White
+kios
+slot_number_for_registration_number KA-01-HH-3141
+kios
+slot_number_for_registration_number MH-04-AY-1111
+kios
