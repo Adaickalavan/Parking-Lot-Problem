@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"pretty"
 	"runtime"
@@ -13,37 +14,21 @@ import (
 func main() {
 	// Verify if input file or interactive mode to be used.
 	// Identify input file name if any.
-	// ii := len(os.Args)
-	// switch {
-	// case ii > 2:
-	// 	log.Fatal("Unknown command line input")
-	// case ii == 2:
-	// 	file, err := os.Open(os.Args[1])
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	defer file.Close()
-	// 	scanner := bufio.NewScanner(file)
-	// 	for scanner.Scan() {
-	// 		fmt.Println(scanner.Text())
-	// 		fmt.Println("kios")
-	// 	}
-
-	// 	if err := scanner.Err(); err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// default:
-	// 	fmt.Println("hi")
-	// }
-
-	// //Create reader input from console
-	// reader := bufio.NewReader(os.Stdin)
-	// // input, _ := reader.ReadString('\n')
-	// // input = strings.TrimRight(input, "\r\n")
-	// // s := parse(input)
-	// // fmt.Println(s)
-
-	// return
+	ii := len(os.Args)
+	var scanner *bufio.Scanner
+	switch {
+	case ii > 2:
+		log.Fatal("Unknown command line input")
+	case ii == 2:
+		file, err := os.Open(os.Args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		scanner = bufio.NewScanner(file)
+	default:
+		scanner = bufio.NewScanner(os.Stdin)
+	}
 
 	//Identify operating system used
 	var terminal string
@@ -53,30 +38,13 @@ func main() {
 		terminal = "\n"
 	}
 
-	reader := bufio.NewReader(os.Stdin)
 	//Create a carpark
 	var carpark = &Carpark{}
 
 	//Initialize carpark
 	exit := false
-	for !exit {
-
-		// file, err := os.Open(os.Args[1])
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// scanner := bufio.NewScanner(file)
-		// for scanner.Scan() {
-		// 	fmt.Println(scanner.Text())
-		// 	fmt.Println("kios")
-		// }
-
-		// if err := scanner.Err(); err != nil {
-		// 	log.Fatal(err)
-		// }
-
-		fmt.Print("Enter command: ")
-		input, _ := reader.ReadString('\n')
+	for !exit && scanner.Scan() {
+		input := scanner.Text()
 		input = strings.TrimRight(input, terminal)
 		s := parse(input)
 		switch s[0] {
@@ -89,17 +57,18 @@ func main() {
 			carpark.init(maxSlot)
 			fmt.Printf("Created parking lot with %v slots\n", maxSlot)
 			exit = true
-
+		case "exit":
+			fmt.Println("inside print eit first")
+			exit = true
 		default: //Default option
 			fmt.Println("Your command cannot be understood")
 		}
 	}
 
-	//Read input queries from console
+	//Read input queries from console or text file
 	exit = false
-	for !exit {
-		fmt.Print("Enter command: ")
-		input, _ := reader.ReadString('\n')
+	for !exit && scanner.Scan() {
+		input := scanner.Text()
 		input = strings.TrimRight(input, terminal)
 		s := parse(input)
 		switch s[0] {
@@ -130,11 +99,17 @@ func main() {
 
 		case "registration_numbers_for_cars_with_colour": //Return registration numbers with given car colour
 			_, registration := carpark.getCarsWithColour(s[1])
-			pretty.Printer(registration)
+			err := pretty.Printer(registration)
+			if err != nil {
+				panic(err.Error())
+			}
 
 		case "slot_numbers_for_cars_with_colour": //Return slot numbers with given car colour
 			slots, _ := carpark.getCarsWithColour(s[1])
-			pretty.Printer(slots)
+			err := pretty.Printer(slots)
+			if err != nil {
+				panic(err.Error())
+			}
 
 		case "slot_number_for_registration_number": //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
@@ -156,8 +131,8 @@ func main() {
 		case "exit": //End carpark operation
 			exit = true
 
-			// default: //Default option
-			// 	fmt.Println("Your command cannot be understood")
+		default: //Default option
+			fmt.Println("Unknown input command")
 		}
 	}
 }
@@ -165,10 +140,4 @@ func main() {
 func parse(input string) []string {
 	s := strings.Split(input, " ")
 	return s
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }

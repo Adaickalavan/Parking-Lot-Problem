@@ -1,4 +1,4 @@
-//Package util implements the heap structure
+//Package minheap implements the min heap structure
 package minheap
 
 //PriorityQueue implements a min heap
