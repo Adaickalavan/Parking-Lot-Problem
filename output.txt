@@ -1,4 +1,3 @@
-hihihi --> create_parking_lot 6
 Created parking lot with 6 slots
 Allocated slot number: 1
 Allocated slot number: 2
@@ -16,9 +15,6 @@ Slot No. Registration No Color
 Allocated slot number: 4
 Sorry, parking lot is full
 KA-01-HH-1234, KA-01-HH-9999, KA-01-P-333
-end of printing
-gterfd
-gterfd
-[1 2 4]
 1, 2, 4
-end of printing
+6
+Not found

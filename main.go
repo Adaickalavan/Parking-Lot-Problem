@@ -30,23 +30,21 @@ func main() {
 		scanner = bufio.NewScanner(os.Stdin)
 	}
 
-	//Identify operating system used
-	var terminal string
-	if runtime.GOOS == "windows" {
-		terminal = "\r\n"
-	} else {
-		terminal = "\n"
-	}
-
 	//Create a carpark
 	var carpark = &Carpark{}
 
+	//Operate the carpark
+	operateCarpark(carpark, scanner)
+}
+
+func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 	//Read input queries from console or text file
+	newlineStr := getNewlineStr()
 	exit := false
 	for !exit && scanner.Scan() {
 
 		input := scanner.Text()
-		input = strings.TrimRight(input, terminal)
+		input = strings.TrimRight(input, newlineStr)
 		s := parse(input)
 
 		switch s[0] {
@@ -125,6 +123,15 @@ func main() {
 		default: //Default option
 			fmt.Println("Unknown input command")
 		}
+	}
+}
+
+func getNewlineStr() string {
+	//Identify operating system and newline character used
+	if runtime.GOOS == "windows" {
+		return "\r\n"
+	} else {
+		return "\n"
 	}
 }
 
