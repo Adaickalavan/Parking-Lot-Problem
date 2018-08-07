@@ -50,14 +50,11 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 		switch s[0] {
 		case "create_parking_lot": //Initialize carpark
 			maxSlot, err := strconv.Atoi(s[1])
-			if err != nil {
-				fmt.Println(err.Error())
+			if checkError(err) {
 				break
 			}
 			err = carpark.init(maxSlot)
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
+			if !checkError(err) {
 				fmt.Printf("Created parking lot with %v slots\n", maxSlot)
 			}
 
@@ -67,29 +64,24 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				colour:       s[2],
 			}
 			slotNo, err := carpark.insertCar(&car)
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
+			if !checkError(err) {
 				fmt.Printf("Allocated slot number: %v\n", slotNo)
 			}
 
 		case "leave": //Remove a parked car
 			slotNo, err := strconv.Atoi(s[1])
-			if err != nil {
-				fmt.Println(err.Error())
+			if checkError(err) {
 				break
 			}
 			err = carpark.removeCar(slotNo)
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
+			if !checkError(err) {
 				fmt.Printf("Slot number %v is free\n", slotNo)
 			}
 
 		case "registration_numbers_for_cars_with_colour": //Return registration numbers with given car colour
 			_, registration, err := carpark.getCarsWithColour(s[1])
-			if err != nil {
-				fmt.Println(err.Error())
+			if checkError(err) {
+				break
 			}
 			err = pretty.Printer(registration)
 			if err != nil {
@@ -98,8 +90,8 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 
 		case "slot_numbers_for_cars_with_colour": //Return slot numbers with given car colour
 			slots, _, err := carpark.getCarsWithColour(s[1])
-			if err != nil {
-				fmt.Println(err.Error())
+			if checkError(err) {
+				break
 			}
 			err = pretty.Printer(slots)
 			if err != nil {
@@ -108,9 +100,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 
 		case "slot_number_for_registration_number": //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
+			if !checkError(err) {
 				fmt.Println(slotNo)
 			}
 
@@ -130,12 +120,19 @@ func getNewlineStr() string {
 	//Identify operating system and newline character used
 	if runtime.GOOS == "windows" {
 		return "\r\n"
-	} else {
-		return "\n"
 	}
+	return "\n"
 }
 
 func parse(input string) []string {
 	s := strings.Split(input, " ")
 	return s
+}
+
+func checkError(err error) bool {
+	if err != nil {
+		fmt.Println(err.Error())
+		return true
+	}
+	return false
 }

@@ -11,7 +11,7 @@ func Printer(in interface{}) error {
 	if (v.Kind() != reflect.Slice) &&
 		(v.Kind() != reflect.Array) &&
 		(v.Kind() != reflect.String) {
-		return fmt.Errorf("Incompatible input type. Received: %v", v.Kind())
+		return fmt.Errorf("Incompatible input type: %v", v.Kind())
 	}
 	if v.Len() == 0 {
 		return nil

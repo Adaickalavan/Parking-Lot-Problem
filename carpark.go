@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"minheap"
+	"os"
+	"text/tabwriter"
 )
 
 // Carpark represents the carpark map, empty slots, and maximum number of slots filled
@@ -40,7 +42,7 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 		slotNo = item.(*minheap.Item).Value
 	}
 	if slotNo > carpark.MaxSlot {
-		return 0, fmt.Errorf("Sorry, parking lot is full")
+		return 0, errors.New("Sorry, parking lot is full")
 	}
 	//Park the car at the slotNo
 	car.slot = slotNo
@@ -63,11 +65,11 @@ func (carpark *Carpark) removeCar(slotNo int) error {
 }
 
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error) {
+	var slots []int
+	var registrations []string
 	if !carpark.initStatus() {
 		return nil, nil, errors.New("Carpark not initialized")
 	}
-	var slots []int
-	var registrations []string
 	for _, v := range carpark.Map {
 		if v.colour == colour {
 			slots = append(slots, v.slot)
@@ -86,17 +88,22 @@ func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, erro
 			return v.slot, nil
 		}
 	}
-	return 0, fmt.Errorf("Not found")
+	return 0, errors.New("Not found")
 }
 
 func (carpark *Carpark) getStatus() {
-	fmt.Println("Slot No. Registration No Color")
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 10, 0, '\t', 0)
+	fmt.Fprintln(w, "Slot No. \t Registration No \t Color")
 	for i := 1; i <= carpark.HighestSlot; i++ {
-		car, ok := carpark.Map[i]
+		_, ok := carpark.Map[i]
 		if ok {
-			fmt.Printf("%v %v %v \n", car.slot, car.registration, car.colour)
+			// fmt.Fprintln(w, car.slot, car.registration, car.colour)
+			fmt.Fprintln(w, "a\tb\tc\t")
 		}
 	}
+	fmt.Fprintln(w)
+	w.Flush()
 }
 
 func (carpark *Carpark) initStatus() bool {
