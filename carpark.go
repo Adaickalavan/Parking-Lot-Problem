@@ -18,7 +18,7 @@ type Carpark struct {
 }
 
 func (carpark *Carpark) init(maxSlot int) error {
-	if carpark.initStatus() {
+	if err := carpark.initStatus(); err == nil {
 		return errors.New("Carpark already initialized")
 	}
 	carpark.Map = make(map[int]*Car)            //Setup a map of the carpark
@@ -29,8 +29,8 @@ func (carpark *Carpark) init(maxSlot int) error {
 }
 
 func (carpark *Carpark) insertCar(car *Car) (int, error) {
-	if !carpark.initStatus() {
-		return 0, errors.New("Carpark not initialized")
+	if err := carpark.initStatus(); err != nil {
+		return 0, err
 	}
 	//Get next available slot if no empty slots avaiable
 	var slotNo int
@@ -51,8 +51,8 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 }
 
 func (carpark *Carpark) removeCar(slotNo int) error {
-	if !carpark.initStatus() {
-		return errors.New("Carpark not initialized")
+	if err := carpark.initStatus(); err != nil {
+		return err
 	}
 	if _, ok := carpark.Map[slotNo]; ok {
 		//Remove car from carpark Map
@@ -67,8 +67,8 @@ func (carpark *Carpark) removeCar(slotNo int) error {
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error) {
 	var slots []int
 	var registrations []string
-	if !carpark.initStatus() {
-		return nil, nil, errors.New("Carpark not initialized")
+	if err := carpark.initStatus(); err != nil {
+		return nil, nil, err
 	}
 	for _, v := range carpark.Map {
 		if v.colour == colour {
@@ -80,8 +80,8 @@ func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error
 }
 
 func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, error) {
-	if !carpark.initStatus() {
-		return 0, errors.New("Carpark not initialized")
+	if err := carpark.initStatus(); err != nil {
+		return 0, err
 	}
 	for _, v := range carpark.Map {
 		if v.registration == registration {
@@ -93,22 +93,21 @@ func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, erro
 
 func (carpark *Carpark) getStatus() {
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 10, 0, '\t', 0)
-	fmt.Fprintln(w, "Slot No. \t Registration No \t Color")
+	w.Init(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "Slot No.\tRegistration No   \tColour\t")
 	for i := 1; i <= carpark.HighestSlot; i++ {
-		_, ok := carpark.Map[i]
+		car, ok := carpark.Map[i]
 		if ok {
-			// fmt.Fprintln(w, car.slot, car.registration, car.colour)
-			fmt.Fprintln(w, "a\tb\tc\t")
+			s := fmt.Sprintf("%v\t%s\t%s", car.slot, car.registration, car.colour)
+			fmt.Fprintln(w, s)
 		}
 	}
-	fmt.Fprintln(w)
 	w.Flush()
 }
 
-func (carpark *Carpark) initStatus() bool {
+func (carpark *Carpark) initStatus() error {
 	if carpark.Map == nil {
-		return false
+		return errors.New("Carpark not initialized")
 	}
-	return true
+	return nil
 }
