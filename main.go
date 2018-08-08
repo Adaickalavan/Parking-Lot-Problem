@@ -12,11 +12,9 @@ import (
 )
 
 func main() {
-	// Verify if input file or interactive mode to be used.
-	// Identify input file name if any.
 	ii := len(os.Args)
 	var scanner *bufio.Scanner
-	switch {
+	switch { //Verify if input file or interactive mode is to be used.
 	case ii > 2:
 		log.Fatal("Unknown command line input")
 	case ii == 2:
@@ -37,8 +35,8 @@ func main() {
 	operateCarpark(carpark, scanner)
 }
 
+//operateCarpark reads input queries from console or text file and executes the command
 func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
-	//Read input queries from console or text file
 	newlineStr := getNewlineStr()
 	exit := false
 	for !exit && scanner.Scan() {
@@ -116,8 +114,8 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 	}
 }
 
+//getNewlineStr identifies operating system and returns newline character used
 func getNewlineStr() string {
-	//Identify operating system and newline character used
 	if runtime.GOOS == "windows" {
 		return "\r\n"
 	}
