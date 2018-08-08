@@ -200,7 +200,34 @@ func TestCarpark_getCarsWithColour(t *testing.T) {
 		want1   []string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{name: "Carpark with car of requested colour",
+			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, MaxSlot: 10},
+			args:    args{colour: "White"},
+			want:    []int{1},
+			want1:   []string{"KA-01-HH-1234"},
+			wantErr: false,
+		},
+		{name: "Carpark without car of requested colour",
+			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			args:    args{colour: "White"},
+			want:    nil,
+			want1:   nil,
+			wantErr: true,
+		},
+		{name: "Empty carpark",
+			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, MaxSlot: 10},
+			args:    args{colour: "White"},
+			want:    nil,
+			want1:   nil,
+			wantErr: true,
+		},
+		{name: "Uninitialized carpark",
+			carpark: &Carpark{},
+			args:    args{colour: "White"},
+			want:    nil,
+			want1:   nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -214,6 +241,56 @@ func TestCarpark_getCarsWithColour(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got1, tt.want1) {
 				t.Errorf("Carpark.getCarsWithColour() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func TestCarpark_getCarWithRegistrationNo(t *testing.T) {
+	type args struct {
+		registration string
+	}
+	tests := []struct {
+		name    string
+		carpark *Carpark
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{name: "Carpark with car of requested colour",
+			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, MaxSlot: 10},
+			args:    args{registration: "KA-01-HH-1234"},
+			want:    1,
+			wantErr: false,
+		},
+		{name: "Carpark without car of requested colour",
+			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			args:    args{registration: "KA-01-HH-1234"},
+			want:    0,
+			wantErr: true,
+		},
+		{name: "Empty carpark",
+			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, MaxSlot: 10},
+			args:    args{registration: "KA-01-HH-1234"},
+			want:    0,
+			wantErr: true,
+		},
+		{name: "Uninitialized carpark",
+			carpark: &Carpark{},
+			args:    args{registration: "KA-01-HH-1234"},
+			want:    0,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.carpark.getCarWithRegistrationNo(tt.args.registration)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Carpark.getCarWithRegistrationNo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Carpark.getCarWithRegistrationNo() = %v, want %v", got, tt.want)
 			}
 		})
 	}
