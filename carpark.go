@@ -35,15 +35,17 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 		return 0, err
 	}
 	var slotNo int
-	if carpark.EmptySlot.Len() == 0 { //Get next available slot if no empty slots avaiable
+	//Check whether all slots are occupied
+	if carpark.EmptySlot.Len() == 0 {
+		if carpark.HighestSlot == carpark.MaxSlot { //Check whether all slots occupied
+			return 0, errors.New("Sorry, parking lot is full")
+		}
+		//Get next available slot
 		slotNo = carpark.HighestSlot + 1
 		carpark.HighestSlot = slotNo
-	} else { //Get nearest empty slot if available
+	} else { //Get nearest empty slot which was previously occupied
 		item := heap.Pop(&carpark.EmptySlot)
 		slotNo = item.(*minheap.Item).Value
-	}
-	if slotNo > carpark.MaxSlot {
-		return 0, errors.New("Sorry, parking lot is full")
 	}
 	//Park the car at the slotNo
 	car.slot = slotNo
@@ -70,23 +72,20 @@ func (carpark *Carpark) removeCar(slotNo int) error {
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error) {
 	var slots []int
 	var registrations []string
-	if err := carpark.initStatus(); err != nil {
-		return nil, nil, err
-	}
 	for _, v := range carpark.Map {
 		if v.colour == colour {
 			slots = append(slots, v.slot)
 			registrations = append(registrations, v.registration)
 		}
 	}
+	if slots == nil {
+		return nil, nil, errors.New("Not found")
+	}
 	return slots, registrations, nil
 }
 
 //Given a car registration number, retrieve the car slot number
 func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, error) {
-	if err := carpark.initStatus(); err != nil {
-		return 0, err
-	}
 	for _, v := range carpark.Map {
 		if v.registration == registration {
 			return v.slot, nil

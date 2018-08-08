@@ -4,7 +4,7 @@ package minheap
 //PriorityQueue implements a min heap
 type PriorityQueue []*Item
 
-//Len returns number of elemsnts in the heap 
+//Len returns number of elemsnts in the heap
 func (pq PriorityQueue) Len() int {
 	return len(pq)
 }
@@ -18,15 +18,11 @@ func (pq PriorityQueue) Less(i int, j int) bool {
 //Swap swaps two items in the heap
 func (pq PriorityQueue) Swap(i int, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
 }
 
 //Push inserts element into priority heap
 func (pq *PriorityQueue) Push(x interface{}) {
-	n := len(*pq)
 	item := x.(*Item)
-	item.index = n
 	*pq = append(*pq, item)
 }
 
@@ -35,7 +31,6 @@ func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
-	item.index = -1
 	*pq = old[0 : n-1]
 	return item
 }

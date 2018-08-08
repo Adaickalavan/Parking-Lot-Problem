@@ -45,8 +45,8 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 		input = strings.TrimRight(input, newlineStr)
 		s := parse(input)
 
-		switch s[0] {
-		case "create_parking_lot": //Initialize carpark
+		switch {
+		case s[0] == "create_parking_lot" && len(s) == 2: //Initialize carpark
 			maxSlot, err := strconv.Atoi(s[1])
 			if checkError(err) {
 				break
@@ -56,7 +56,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				fmt.Printf("Created parking lot with %v slots\n", maxSlot)
 			}
 
-		case "park": //Park a new car
+		case s[0] == "park" && len(s) == 3: //Park a new car
 			car := Car{
 				registration: s[1],
 				colour:       s[2],
@@ -66,7 +66,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				fmt.Printf("Allocated slot number: %v\n", slotNo)
 			}
 
-		case "leave": //Remove a parked car
+		case s[0] == "leave" && len(s) == 2: //Remove a parked car
 			slotNo, err := strconv.Atoi(s[1])
 			if checkError(err) {
 				break
@@ -76,7 +76,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				fmt.Printf("Slot number %v is free\n", slotNo)
 			}
 
-		case "registration_numbers_for_cars_with_colour": //Return registration numbers with given car colour
+		case s[0] == "registration_numbers_for_cars_with_colour" && len(s) == 2: //Return registration numbers with given car colour
 			_, registration, err := carpark.getCarsWithColour(s[1])
 			if checkError(err) {
 				break
@@ -86,7 +86,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				panic(err.Error())
 			}
 
-		case "slot_numbers_for_cars_with_colour": //Return slot numbers with given car colour
+		case s[0] == "slot_numbers_for_cars_with_colour" && len(s) == 2: //Return slot numbers with given car colour
 			slots, _, err := carpark.getCarsWithColour(s[1])
 			if checkError(err) {
 				break
@@ -96,16 +96,16 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 				panic(err.Error())
 			}
 
-		case "slot_number_for_registration_number": //Return slot numbers with given car registration number
+		case s[0] == "slot_number_for_registration_number" && len(s) == 2: //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
 			if !checkError(err) {
 				fmt.Println(slotNo)
 			}
 
-		case "status": //Retrieve cars parked in carpark
+		case s[0] == "status" && len(s) == 1: //Retrieve cars parked in carpark
 			carpark.getStatus()
 
-		case "exit": //End carpark operation
+		case s[0] == "exit" && len(s) == 1: //End carpark operation
 			exit = true
 
 		default: //Default option
