@@ -11,9 +11,9 @@ import (
 
 //Carpark represents the carpark map, empty slots, and maximum number of slots filled
 type Carpark struct {
-	Map         map[int]*Car          //Properties of each parked in the carpark
-	EmptySlot   minheap.PriorityQueue //Heap containing sorted empty slots in ascending order
-	HighestSlot int                   //Highest number of slots filled throughout carpark operation
+	Map         map[int]*Car          //Properties of each car parked in the carpark
+	emptySlot   minheap.PriorityQueue //Heap containing sorted empty slots in ascending order
+	highestSlot int                   //Highest number of slots filled throughout carpark operation
 	MaxSlot     int                   //Maximum number of slots available
 }
 
@@ -23,8 +23,8 @@ func (carpark *Carpark) init(maxSlot int) error {
 		return errors.New("Carpark already initialized")
 	}
 	carpark.Map = make(map[int]*Car)            //Setup a map of the carpark
-	carpark.EmptySlot = minheap.PriorityQueue{} //Setup an empty heap of empty parking slots
-	heap.Init(&carpark.EmptySlot)               //Initialize the heap of empty parking slots
+	carpark.emptySlot = minheap.PriorityQueue{} //Setup an empty heap of empty parking slots
+	heap.Init(&carpark.emptySlot)               //Initialize the heap of empty parking slots
 	carpark.MaxSlot = maxSlot                   //Set the maximum number of slots
 	return nil
 }
@@ -36,15 +36,15 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 	}
 	var slotNo int
 	//Check whether all slots are occupied
-	if carpark.EmptySlot.Len() == 0 {
-		if carpark.HighestSlot == carpark.MaxSlot { //Check whether all slots occupied
+	if carpark.emptySlot.Len() == 0 {
+		if carpark.highestSlot == carpark.MaxSlot { //Check whether all slots occupied
 			return 0, errors.New("Sorry, parking lot is full")
 		}
 		//Get next available slot
-		slotNo = carpark.HighestSlot + 1
-		carpark.HighestSlot = slotNo
+		slotNo = carpark.highestSlot + 1
+		carpark.highestSlot = slotNo
 	} else { //Get nearest empty slot which was previously occupied
-		item := heap.Pop(&carpark.EmptySlot)
+		item := heap.Pop(&carpark.emptySlot)
 		slotNo = item.(*minheap.Item).Value
 	}
 	//Park the car at the slotNo
@@ -62,7 +62,7 @@ func (carpark *Carpark) removeCar(slotNo int) error {
 		//Remove car from carpark Map
 		delete(carpark.Map, slotNo)
 		//Add empty slot to the heap
-		heap.Push(&carpark.EmptySlot, &minheap.Item{Value: slotNo})
+		heap.Push(&carpark.emptySlot, &minheap.Item{Value: slotNo})
 		return nil
 	}
 	return errors.New("Car non-existent in carpark")
@@ -99,7 +99,7 @@ func (carpark *Carpark) getStatus() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "Slot No.\tRegistration No   \tColour\t")
-	for i := 1; i <= carpark.HighestSlot; i++ {
+	for i := 1; i <= carpark.highestSlot; i++ {
 		car, ok := carpark.Map[i]
 		if ok {
 			s := fmt.Sprintf("%v\t%s\t%s", car.slot, car.registration, car.colour)
