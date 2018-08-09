@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"log"
 	"minheap"
 	"reflect"
 	"testing"
@@ -300,31 +297,29 @@ func TestCarpark_getCarWithRegistrationNo(t *testing.T) {
 }
 
 func TestCarpark_getStatus(t *testing.T) {
-	buf1 := `Slot No.    Registration No    Colour`
-	buf := &bytes.Buffer{}
-	out = buf
-
 	tests := []struct {
-		name      string
-		carpark   *Carpark
-		wantPrint string
+		name    string
+		carpark *Carpark
+		want    []*Car
 	}{
 		{name: "Carpark not initialized",
 			carpark: &Carpark{},
+			want:    nil,
 		},
 		{name: "Empty carpark",
 			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, maxSlot: 10},
+			want:    nil,
 		},
 		{name: "Carpark with cars",
 			carpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 10},
+			want:    []*Car{values().car1, values().car2},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.carpark.getStatus()
-			fmt.Println(buf.String())
-			fmt.Println(buf1)
-			log.Fatal("ji")
+			if got := tt.carpark.getStatus(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Carpark.getStatus() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }
