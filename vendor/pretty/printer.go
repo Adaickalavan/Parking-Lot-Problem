@@ -2,11 +2,12 @@ package pretty
 
 import (
 	"fmt"
+	"io"
 	"reflect"
 )
 
 // Printer pretty prints any array, slice, or string
-func Printer(in interface{}) error {
+func Printer(in interface{}, output io.Writer) error {
 	v := reflect.ValueOf(in)
 	if (v.Kind() != reflect.Slice) &&
 		(v.Kind() != reflect.Array) &&
@@ -17,8 +18,8 @@ func Printer(in interface{}) error {
 		return nil
 	}
 	for i := 0; i < v.Len()-1; i++ {
-		fmt.Printf("%v, ", v.Index(i))
+		fmt.Fprintf(output, "%v, ", v.Index(i))
 	}
-	fmt.Printf("%v\n", v.Index(v.Len()-1))
+	fmt.Fprintf(output, "%v\n", v.Index(v.Len()-1))
 	return nil
 }

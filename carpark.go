@@ -34,7 +34,7 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 	var slotNo int
 	//Check whether all slots are occupied
 	if carpark.emptySlot.Len() == 0 {
-		if carpark.highestSlot == carpark.maxSlot { //Check whether all slots occupied
+		if carpark.highestSlot == carpark.maxSlot { //Check whether all slots are occupied
 			return 0, errors.New("Sorry, parking lot is full")
 		}
 		//Get next available slot
@@ -69,10 +69,11 @@ func (carpark *Carpark) removeCar(slotNo int) error {
 func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error) {
 	var slots []int
 	var registrations []string
-	for _, v := range carpark.Map {
-		if v.colour == colour {
-			slots = append(slots, v.slot)
-			registrations = append(registrations, v.registration)
+	for i := 1; i <= carpark.highestSlot; i++ {
+		car, _ := carpark.Map[i]
+		if car.colour == colour {
+			slots = append(slots, car.slot)
+			registrations = append(registrations, car.registration)
 		}
 	}
 	if slots == nil {
@@ -91,7 +92,7 @@ func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, erro
 	return 0, errors.New("Not found")
 }
 
-//Retrieve details of the cars parked in the carpark in order
+//Retrieve ordered sequence of cars parked in the carpark
 func (carpark *Carpark) getStatus() []*Car {
 	var cars []*Car
 	for i := 1; i <= carpark.highestSlot; i++ {
