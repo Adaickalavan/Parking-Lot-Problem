@@ -9,23 +9,28 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 )
 
+var inputInteractive = os.Stdin
+
 func main() {
+
+	//Input file or interactive mode
 	ii := len(os.Args)
 	var scanner *bufio.Scanner
-	switch { //Verify if input file or interactive mode is to be used.
+	switch {
 	case ii > 2:
 		log.Fatal("Unknown command line input")
 	case ii == 2:
-		file, err := os.Open(os.Args[1])
+		inputFile, err := os.Open(os.Args[1])
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
-		defer file.Close()
-		scanner = bufio.NewScanner(file)
+		defer inputFile.Close()
+		scanner = bufio.NewScanner(inputFile)
 	default:
-		scanner = bufio.NewScanner(os.Stdin)
+		scanner = bufio.NewScanner(inputInteractive)
 	}
 
 	//Create a carpark
@@ -103,7 +108,15 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			}
 
 		case s[0] == "status" && len(s) == 1: //Retrieve cars parked in carpark
-			carpark.getStatus()
+			cars := carpark.getStatus()
+			w := new(tabwriter.Writer)
+			w.Init(os.Stdout, 0, 0, 4, ' ', 0)
+			fmt.Fprintln(w, "Slot No.\tRegistration No\tColour\t")
+			for _, car := range cars {
+				s := fmt.Sprintf("%v\t%s\t%s", car.slot, car.registration, car.colour)
+				fmt.Fprintln(w, s)
+			}
+			w.Flush()
 
 		case s[0] == "exit" && len(s) == 1: //End carpark operation
 			exit = true

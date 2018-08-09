@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"log"
 	"minheap"
 	"reflect"
 	"testing"
@@ -49,7 +52,7 @@ func compareCarpark(t *testing.T, carpark *Carpark, wantCarpark *Carpark) {
 	if !reflect.DeepEqual(carpark.Map, wantCarpark.Map) ||
 		!reflect.DeepEqual(carpark.emptySlot, wantCarpark.emptySlot) ||
 		carpark.highestSlot != wantCarpark.highestSlot ||
-		carpark.MaxSlot != wantCarpark.MaxSlot {
+		carpark.maxSlot != wantCarpark.maxSlot {
 		t.Errorf("gotCarpark = %v, wantCarpark = %v", carpark, wantCarpark)
 	}
 }
@@ -69,13 +72,13 @@ func TestCarpark_init(t *testing.T) {
 			carpark:     &Carpark{},
 			args:        args{maxSlot: 12},
 			wantErr:     false,
-			wantCarpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, MaxSlot: 12},
+			wantCarpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, maxSlot: 12},
 		},
 		{name: "Carpark already initialized",
-			carpark:     &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 8, MaxSlot: 10},
+			carpark:     &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 8, maxSlot: 10},
 			args:        args{maxSlot: 12},
 			wantErr:     true,
-			wantCarpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 8, MaxSlot: 10},
+			wantCarpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 8, maxSlot: 10},
 		},
 	}
 	for _, tt := range tests {
@@ -110,25 +113,25 @@ func TestCarpark_insertCar(t *testing.T) {
 			wantCarpark: &Carpark{},
 		},
 		{name: "Insert car into new slot",
-			carpark:     &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, MaxSlot: 10},
+			carpark:     &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, maxSlot: 10},
 			args:        args{car: values().car2},
 			want:        2,
 			wantErr:     false,
-			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, MaxSlot: 10},
+			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 10},
 		},
 		{name: "Insert car into a previously occupied but now free slot",
-			carpark:     &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			carpark:     &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, maxSlot: 10},
 			args:        args{car: values().car1},
 			want:        1,
 			wantErr:     false,
-			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, MaxSlot: 10},
+			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 10},
 		},
-		{name: "Insert car beyond MaxSlot",
-			carpark:     &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, MaxSlot: 2},
+		{name: "Insert car beyond maxSlot",
+			carpark:     &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 2},
 			args:        args{car: values().car0},
 			want:        0,
 			wantErr:     true,
-			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, MaxSlot: 2},
+			wantCarpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 2},
 		},
 	}
 
@@ -165,16 +168,16 @@ func TestCarpark_removeCar(t *testing.T) {
 			wantCarpark: &Carpark{},
 		},
 		{name: "Remove car",
-			carpark:     &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, MaxSlot: 10},
+			carpark:     &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 10},
 			args:        args{slotNo: 1},
 			wantErr:     false,
-			wantCarpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			wantCarpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, maxSlot: 10},
 		},
 		{name: "Remove non-existent car",
-			carpark:     &Carpark{Map: values().map1, emptySlot: values().emptySlot2, highestSlot: 2, MaxSlot: 10},
+			carpark:     &Carpark{Map: values().map1, emptySlot: values().emptySlot2, highestSlot: 2, maxSlot: 10},
 			args:        args{slotNo: 2},
 			wantErr:     true,
-			wantCarpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot2, highestSlot: 2, MaxSlot: 10},
+			wantCarpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot2, highestSlot: 2, maxSlot: 10},
 		},
 	}
 	for _, tt := range tests {
@@ -201,21 +204,21 @@ func TestCarpark_getCarsWithColour(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Carpark with car of requested colour",
-			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, maxSlot: 10},
 			args:    args{colour: "White"},
 			want:    []int{1},
 			want1:   []string{"KA-01-HH-1234"},
 			wantErr: false,
 		},
 		{name: "Carpark without car of requested colour",
-			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, maxSlot: 10},
 			args:    args{colour: "White"},
 			want:    nil,
 			want1:   nil,
 			wantErr: true,
 		},
 		{name: "Empty carpark",
-			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, maxSlot: 10},
 			args:    args{colour: "White"},
 			want:    nil,
 			want1:   nil,
@@ -258,19 +261,19 @@ func TestCarpark_getCarWithRegistrationNo(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Carpark with car of requested colour",
-			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map1, emptySlot: values().emptySlot0, highestSlot: 1, maxSlot: 10},
 			args:    args{registration: "KA-01-HH-1234"},
 			want:    1,
 			wantErr: false,
 		},
 		{name: "Carpark without car of requested colour",
-			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map2, emptySlot: values().emptySlot1, highestSlot: 2, maxSlot: 10},
 			args:    args{registration: "KA-01-HH-1234"},
 			want:    0,
 			wantErr: true,
 		},
 		{name: "Empty carpark",
-			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, MaxSlot: 10},
+			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, maxSlot: 10},
 			args:    args{registration: "KA-01-HH-1234"},
 			want:    0,
 			wantErr: true,
@@ -292,6 +295,36 @@ func TestCarpark_getCarWithRegistrationNo(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("Carpark.getCarWithRegistrationNo() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestCarpark_getStatus(t *testing.T) {
+	buf1 := `Slot No.    Registration No    Colour`
+	buf := &bytes.Buffer{}
+	out = buf
+
+	tests := []struct {
+		name      string
+		carpark   *Carpark
+		wantPrint string
+	}{
+		{name: "Carpark not initialized",
+			carpark: &Carpark{},
+		},
+		{name: "Empty carpark",
+			carpark: &Carpark{Map: values().map0, emptySlot: values().emptySlot0, highestSlot: 0, maxSlot: 10},
+		},
+		{name: "Carpark with cars",
+			carpark: &Carpark{Map: values().mapAll, emptySlot: values().emptySlot0, highestSlot: 2, maxSlot: 10},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.carpark.getStatus()
+			fmt.Println(buf.String())
+			fmt.Println(buf1)
+			log.Fatal("ji")
 		})
 	}
 }

@@ -3,10 +3,7 @@ package main
 import (
 	"container/heap"
 	"errors"
-	"fmt"
 	"minheap"
-	"os"
-	"text/tabwriter"
 )
 
 //Carpark represents the carpark map, empty slots, and maximum number of slots filled
@@ -14,7 +11,7 @@ type Carpark struct {
 	Map         map[int]*Car          //Properties of each car parked in the carpark
 	emptySlot   minheap.PriorityQueue //Heap containing sorted empty slots in ascending order
 	highestSlot int                   //Highest number of slots filled throughout carpark operation
-	MaxSlot     int                   //Maximum number of slots available
+	maxSlot     int                   //Maximum number of slots available
 }
 
 //Initialize carpark parameters
@@ -25,7 +22,7 @@ func (carpark *Carpark) init(maxSlot int) error {
 	carpark.Map = make(map[int]*Car)            //Setup a map of the carpark
 	carpark.emptySlot = minheap.PriorityQueue{} //Setup an empty heap of empty parking slots
 	heap.Init(&carpark.emptySlot)               //Initialize the heap of empty parking slots
-	carpark.MaxSlot = maxSlot                   //Set the maximum number of slots
+	carpark.maxSlot = maxSlot                   //Set the maximum number of slots
 	return nil
 }
 
@@ -37,7 +34,7 @@ func (carpark *Carpark) insertCar(car *Car) (int, error) {
 	var slotNo int
 	//Check whether all slots are occupied
 	if carpark.emptySlot.Len() == 0 {
-		if carpark.highestSlot == carpark.MaxSlot { //Check whether all slots occupied
+		if carpark.highestSlot == carpark.maxSlot { //Check whether all slots occupied
 			return 0, errors.New("Sorry, parking lot is full")
 		}
 		//Get next available slot
@@ -94,19 +91,16 @@ func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, erro
 	return 0, errors.New("Not found")
 }
 
-//Print details of all the cars parked in the carpark
-func (carpark *Carpark) getStatus() {
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "Slot No.\tRegistration No   \tColour\t")
+//Retrieve details of the cars parked in the carpark in order
+func (carpark *Carpark) getStatus() []*Car {
+	var cars []*Car
 	for i := 1; i <= carpark.highestSlot; i++ {
 		car, ok := carpark.Map[i]
 		if ok {
-			s := fmt.Sprintf("%v\t%s\t%s", car.slot, car.registration, car.colour)
-			fmt.Fprintln(w, s)
+			cars = append(cars, car)
 		}
 	}
-	w.Flush()
+	return cars
 }
 
 //Check whether the carpark has been initialized
