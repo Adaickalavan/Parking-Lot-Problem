@@ -20,6 +20,7 @@
 4. **Unit test and functional test**
     + Navigate to `$GOPATH/src/parking-lot` and type `go test -v` in the bash terminal to run the complete test suite. Here, `-v` is the verbose command flag.
     + Navigate to `$GOPATH/src/parking-lot` and type `go test -v -run xxxx` in the bash terminal to run a specific test. Here, `xxxx` is the name of test case.
+    + Test coverage: 94.1% of statements
 5. **Running**
     + Type `parking-lot` in the bash terminal to launch interactive user input
     + Type `parking-lot inputFile.txt` in the bash terminal to launch file input mode. Here, `inputFile.txt` refers to your input file name with complete path.
@@ -35,7 +36,7 @@ $GOPATH
 ├── pkg                               # contains package objects
 └── src                               # contains Go source files
     └── parking_lot                   # main folder
-        ├── vendor                    # folder containing dependant packages
+        ├── vendor                    # folder containing dependancies
         │   ├── minheap               # dependant package `minheap`  
         │   │   ├── item.go           # element of heap
         │   │   └── priorityQueue.go  # min heap implementation
