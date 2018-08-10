@@ -53,7 +53,7 @@ func Test_main(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Args = tt.args
 			main()
-
+			
 		})
 	}
 }

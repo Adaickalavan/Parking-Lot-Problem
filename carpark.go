@@ -70,8 +70,8 @@ func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error
 	var slots []int
 	var registrations []string
 	for i := 1; i <= carpark.highestSlot; i++ {
-		car, _ := carpark.Map[i]
-		if car.colour == colour {
+		car, ok := carpark.Map[i]
+		if ok && car.colour == colour {
 			slots = append(slots, car.slot)
 			registrations = append(registrations, car.registration)
 		}
@@ -84,9 +84,9 @@ func (carpark *Carpark) getCarsWithColour(colour string) ([]int, []string, error
 
 //Given a car registration number, retrieve the car slot number
 func (carpark *Carpark) getCarWithRegistrationNo(registration string) (int, error) {
-	for _, v := range carpark.Map {
-		if v.registration == registration {
-			return v.slot, nil
+	for _, car := range carpark.Map {
+		if car.registration == registration {
+			return car.slot, nil
 		}
 	}
 	return 0, errors.New("Not found")
