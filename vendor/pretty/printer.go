@@ -7,7 +7,7 @@ import (
 )
 
 // Printer pretty prints any array, slice, or string
-func Printer(in interface{}, output io.Writer) error {
+func Printer(in interface{}, outStream io.Writer) error {
 	v := reflect.ValueOf(in)
 	if (v.Kind() != reflect.Slice) &&
 		(v.Kind() != reflect.Array) &&
@@ -18,8 +18,8 @@ func Printer(in interface{}, output io.Writer) error {
 		return nil
 	}
 	for i := 0; i < v.Len()-1; i++ {
-		fmt.Fprintf(output, "%v, ", v.Index(i))
+		fmt.Fprintf(outStream, "%v, ", v.Index(i))
 	}
-	fmt.Fprintf(output, "%v\n", v.Index(v.Len()-1))
+	fmt.Fprintf(outStream, "%v\n", v.Index(v.Len()-1))
 	return nil
 }

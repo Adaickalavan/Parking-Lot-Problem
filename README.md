@@ -17,7 +17,7 @@
     + Copy and paste the entire `parking-lot folder` into `$GOPATH/src` in your computer
 3. **Executable**
     + Navigate to `$GOPATH/src/parking-lot` and type `go install` in the bash terminal to compile and create an executable
-4. **Testing**
+4. **Unit test and functional test**
     + Navigate to `$GOPATH/src/parking-lot` and type `go test -v` in the bash terminal to run the complete test suite. Here, `-v` is the verbose command flag.
     + Navigate to `$GOPATH/src/parking-lot` and type `go test -v -run xxxx` in the bash terminal to run a specific test. Here, `xxxx` is the name of test case.
 5. **Running**
@@ -47,8 +47,7 @@ $GOPATH
         ├── main.go                   # main file of Go code
         ├── main_test.go              # functional test of the main code
         ├── inputFile.txt             # sample input file for testing
-        ├── inputInteractive.txt      # sample interactive input for testing
-        └── output.txt                # sample expected output for testing
+        └── inputInteractive.txt      # sample interactive input for testing
 ```
 
 ## Notes on solution
@@ -56,8 +55,8 @@ $GOPATH
 1. **Data structures**
    + A hash map and a min heap was used to solve the parking lot problem.
 2. **Complexity**
-    + To park a car: O(lg(n1)). Here, n1 is the size of the min heap.
-    + To remove a car: O(lg(n1)). Here, n1 is the size of the min heap.
+    + To park a car: O(log(n1)). Here, n1 is the size of the min heap.
+    + To remove a car: O(log(n1)). Here, n1 is the size of the min heap.
     + To retrieve a car by colour: O(n2). Here, n2 is the size of the hash map.
     + To retrieve a car by registration number: O(n2). Here, n2 is the size of the hash map.
     + To get status: O(n2). Here, n2 is the size of the hash map.

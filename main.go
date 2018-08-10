@@ -14,7 +14,7 @@ import (
 )
 
 var inputInteractive io.Reader = os.Stdin
-var output io.Writer = os.Stdout
+var outStream io.Writer = os.Stdout
 
 func main() {
 
@@ -47,7 +47,6 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 	newlineStr := getNewlineStr()
 	exit := false
 	for !exit && scanner.Scan() {
-
 		input := scanner.Text()
 		input = strings.TrimRight(input, newlineStr)
 		s := parse(input)
@@ -60,7 +59,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			}
 			err = carpark.init(maxSlot)
 			if !checkError(err) {
-				fmt.Fprintf(output, "Created a parking lot with %v slots\n", maxSlot)
+				fmt.Fprintf(outStream, "Created a parking lot with %v slots\n", maxSlot)
 			}
 
 		case s[0] == "park" && len(s) == 3: //Park a new car
@@ -70,7 +69,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			}
 			slotNo, err := carpark.insertCar(&car)
 			if !checkError(err) {
-				fmt.Fprintf(output, "Allocated slot number: %v\n", slotNo)
+				fmt.Fprintf(outStream, "Allocated slot number: %v\n", slotNo)
 			}
 
 		case s[0] == "leave" && len(s) == 2: //Remove a parked car
@@ -80,7 +79,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			}
 			err = carpark.removeCar(slotNo)
 			if !checkError(err) {
-				fmt.Fprintf(output, "Slot number %v is free\n", slotNo)
+				fmt.Fprintf(outStream, "Slot number %v is free\n", slotNo)
 			}
 
 		case s[0] == "registration_numbers_for_cars_with_colour" && len(s) == 2: //Return registration numbers with given car colour
@@ -88,7 +87,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			if checkError(err) {
 				break
 			}
-			err = pretty.Printer(registration, output)
+			err = pretty.Printer(registration, outStream)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -98,7 +97,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			if checkError(err) {
 				break
 			}
-			err = pretty.Printer(slots, output)
+			err = pretty.Printer(slots, outStream)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -106,14 +105,13 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 		case s[0] == "slot_number_for_registration_number" && len(s) == 2: //Return slot numbers with given car registration number
 			slotNo, err := carpark.getCarWithRegistrationNo(s[1])
 			if !checkError(err) {
-				fmt.Fprintln(output, slotNo)
+				fmt.Fprintln(outStream, slotNo)
 			}
 
 		case s[0] == "status" && len(s) == 1: //Retrieve cars parked in carpark
 			cars := carpark.getStatus()
-
-			var w = tabwriter.NewWriter(output, 0, 0, 4, ' ', 0)
-			fmt.Fprintln(w, "Slot No.\tRegistration No\tColour\t")
+			var w = tabwriter.NewWriter(outStream, 0, 0, 4, ' ', 0)
+			fmt.Fprintln(w, "Slot No.\tRegistration No\tColour")
 			for _, car := range cars {
 				s := fmt.Sprintf("%v\t%s\t%s", car.slot, car.registration, car.colour)
 				fmt.Fprintln(w, s)
@@ -124,7 +122,7 @@ func operateCarpark(carpark *Carpark, scanner *bufio.Scanner) {
 			exit = true
 
 		default: //Default option
-			fmt.Fprintln(output, "Unknown input command")
+			fmt.Fprintln(outStream, "Unknown input command")
 		}
 	}
 }
@@ -144,7 +142,7 @@ func parse(input string) []string {
 
 func checkError(err error) bool {
 	if err != nil {
-		fmt.Fprintln(output, err.Error())
+		fmt.Fprintln(outStream, err.Error())
 		return true
 	}
 	return false
