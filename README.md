@@ -62,8 +62,8 @@ $GOPATH
     + To get status: O(n2). Here, n2 is the size of the hash map.
 3. **Assumptions and rationale for choice of data structures to optimize complexity**
     + Car parking and removing operations will be more frequent compared to retrieving car by colour/registration number or status requests.
-    + A hash map with `slot number` as `key` is used to store all the cars parked in the carpark. Complexity O(1) simplifies insertion and removal of cars by slot number.
-    + A min heap is used to store *previoulsy-occupied-but-now-empty* slots in ordered sequence with complexity of O(log(n1)) for push and pop operations. Here, *empty slots n1 refer only to slots which were previously occupied but is now free*. It does not refer to the total number of free slots in the carpark.
+    + A hash map with `slot number` as `key` is used to store all the cars parked in the carpark. Complexity O(1) of hash map simplifies insertion and removal of cars by slot number.
+    + A min heap is used to store *previoulsy-occupied-but-now-empty* slots in ordered sequence with complexity O(log(n1)) for push and pop operations. Here, *empty slots n1 refer only to slots which were previously occupied but is now free*. It does not refer to the total number of free slots in the carpark.
 4. **Alternative solutions to reduce complexity at the expense of increased memory**
     + To achieve complexity O(1) in retrieving a car by colour, implement an additional hash map with `colour` as `key` to store all the cars parked in the carpark.
     + To achieve complexity O(1) in retrieving a car by registration number, implement an additional hash map with `registration number` as `key` to store all the cars parked in the carpark.
