@@ -145,10 +145,11 @@ At the end of this project, we should be able to:
         export PATH=$PATH:$GOPATH/bin
         ```
 2. **Source code**
-    + Git clone the entire project folder into `$GOPATH/src/parking_lot` folder in your computer
+    + Git clone the project into `$GOPATH/src/parking_lot` folder in your computer.
         ```
-        git clone https://github.com/Adaickalavan/Parking-Lot-Problem.git
+        git clone https://github.com/Adaickalavan/Parking-Lot-Problem.git $GOPATH/src/parking_lot
         ```
+        Here, git clone syntax follows the pattern: `git clone <repo> <local folder-name>`.
 3. **Executable**
     + To create an executable in the `$GOPATH/bin/` directory, execute
         ```
